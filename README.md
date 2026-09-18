@@ -4,29 +4,7 @@ https://www.alibabacloud.com/blog/getting-started-with-kubernetes-%7C-kubernetes
 
 # Lab
 
-## Kind
-
-Local setup, kubectl
-
-## kube config
-
-### Kubie
-
-## Create simple pod
-
-### commands
-
-get, describe, logs, delete, apply, top, exec
-
-## Add service
-
-## Port Forward
-
-## Debug Container
-
-## Create simple deployment
-
-Replicas
+[lab](lab.md)
 
 # Nodes
 
