@@ -11,15 +11,18 @@ kind create cluster --name mycluster
 kind get kubeconfig --name mycluster > ~/.kube/mycluster.yaml
 ```
 
-## Kubi
+## Config
 
-https://github.com/kubie-org/kubie
-
-Alternativ:
+### Simple
 
 ```bash
 export KUBECONFIG=~/.kube/mycluster.yaml
 ```
+
+### Kubie
+
+https://github.com/kubie-org/kubie
+
 
 ## Run pod
 
@@ -42,13 +45,13 @@ curl localhost:8080
 ### Delete pod
 
 ```bash
-kc delete pod nginx-pod
+kubectl delete pod nginx-pod
 ```
 
 ## Create deployment & Service
 
-* Skapa fileen [deploment.yaml](lab/1/deployment.yaml)
-* Skapa fileen [serice.yaml](lab/1/service.yaml)
+* Skapa filen [deploment.yaml](lab/1/deployment.yaml)
+* Skapa filen [serice.yaml](lab/1/service.yaml)
 
 ```bash
 kubectl apply -f deployment.yaml
@@ -81,17 +84,23 @@ curl localhost:8080
 kubectl apply -f deployment.yaml
 ```
 
+## Delete pod
+
+```bash
+kubectl delete pod nginx-deployment-756d4cb589-k6867
+```
+
+The pod is recreated.
+
 ## Delete deployment & Service
 
 ```bash
 kubectl delete svc nginx-svc
+kubectl delete deploment nginx-deployment
 ```
-eller:
+or:
 ```bash
 kubectl delete -f service.yaml
-```
-
-```bash
 kubectl delete -f deployment.yaml
 ```
 
