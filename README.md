@@ -310,3 +310,7 @@ Fixa access, hämta k8s config.
 # AI support
 
 ## K8sGPT
+
+Ett LLM verktyg som kan analysera kluster automatiskt och spotta ur sig en lista över fel som den tycker sig hitta.
+
+(visa exempel)
