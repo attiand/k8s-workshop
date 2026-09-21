@@ -232,13 +232,25 @@ kubectl get endpoints api-service -n backend
 
 ## CM (Config Maps)
 
+En ConfigMap är ett API-objekt som används för att lagra icke-känslig data i form av nyckel-värde-par.
+
+Dess huvudsakliga syfte är att separera miljöspecifik konfiguration från images.
+
+En Pod kan läsa CM's på 3 olika sätt
+
+* Miljövariabler, Mappa nycklarna till miljövariabler
+
+* Monterade volymer: Montera din ConfigMap som en fil eller mapp inuti containern. Detta är perfekt för att skicka in hela konfigurationsfiler.
+
+* Command-Line Arguments: Skicka in värdena i containerns startkommando.
+
 ## Secrets
 
-En Secret är ett Kubernetes-objekt avsett för att lagra och hantera känslig data – såsom lösenord, tokens, API-nycklar och SSH/TLS-certifikat 
+En Secret är en speciell CM för att lagra och hantera känslig data – såsom lösenord, tokens, API-nycklar och SSH/TLS-certifikat 
 
 – utan att hårdkoda dem i container-images eller pod-specar.
 
-Vi använder external-secret-operator som gör att vi kan lagra hemligheterna i Hashicorp Vault och sedan mappa detta till kubernetes secrets.
+Vi använder `external-secret-operator` som gör att vi kan lagra hemligheterna i Hashicorp Vault och sedan mappa detta till kubernetes secrets.
 
 Det finns två vanliga sätt att ge en container tillgång till en Secret:
 
@@ -274,20 +286,62 @@ kubectl describe pod my-pod
 
 # Helm
 
-Helm is the official package manager for Kubernetes. Go template language.
+The official package manager for Kubernetes, Helm utilizes the Go template language. Helm charts are usually provided directly by the software vendors.
 
-## Dry run
+## Create
 
 ```bash
-helm template .
+mkdir mychart
+helm create mychart
+
+# dry run
+helm template mychart
+```
+
+## Example
+
+https://github.com/helm/examples
+
+```bash
+helm repo add examples https://helm.github.io/examples
+
+# dry run
+helm template ahoy examples/hello-world
+
+helm install ahoy examples/hello-world
+
+helm uninstall ahoy
 ```
 
 # Kustomize
+
+Kustomize is a tool built natively into Kubernetes that lets you customize YAML files for different environments (like dev, stage, and prod) without modifying the original manifests.
+
+Instead of using complex templates with variables (like Helm), Kustomize relies on a base and overlay architecture to merge configurations together.
+
+* Built into `kubectl`
+* Built-in Generators: Kustomize can automatically generate ConfigMaps and Secrets from external files or literal values
+* Transformers, Patches manifests
+* Can generate from Helm charts `--enable-helm`
+
+```
+./base/kustomization.yaml
+./base/deployment.yaml
+./base/service.yaml
+./envs/lab/kustomization.yaml
+./envs/stage/kustomization.yaml
+```
 
 ## Dry run
 
 ```bash
 kubectl kustomize --enable-helm .
+```
+
+## Execute
+
+```bash
+kubectl apply -k --enable-helm .
 ```
 
 # Storage
