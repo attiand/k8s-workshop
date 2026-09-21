@@ -8,14 +8,61 @@ https://www.alibabacloud.com/blog/getting-started-with-kubernetes-%7C-kubernetes
 
 # Nodes
 
+En Node är en fysisk eller virtuell maskin som utgör själva beräkningskapaciteten i ett Kubernetes-kluster. 
+Det är här alla containers/poddar faktiskt körs. Varje nod hanteras av kontrollplanet (Control Plane) och kör de nödvändiga komponenterna för att driva containers: 
+kubelet (nodagenten), en container runtime (t.ex. containerd eller CRI-O) samt kube-proxy (nätverkshantering).
+
+Lista alla noder och deras status
+
+    kubectl get nodes
+
+Beskriv en nod, bra för att kolla ev fel på noden
+
+    kubectl describe node <nodnamn>
+
+Om man vill se en snapp överblick över CPU och Minnesanvändning så finns också top
+
+    kubectl top nodes
+
 # Network
 
 ## Pod network
 
 I Kubernetes lever varje pod i ett eget isolerat nätverksnamnrymd (network namespace) och tilldelas en unik intern IP-
-adress ur ett dedikerat subnät (Pod CIDR).
+adress ur ett dedikerat subnät (Pod CIDR som ställs in vid installation av k3s).
+
+Grundregler för pod-nätverket:
+
+    Alla poddar kan kommunicera med alla andra poddar på alla noder utan NAT (Network Address Translation).
+
+    Agenten på en nod (t.ex. kubelet) kan kommunicera med alla poddar på samma nod.
+
+    Poddens egen IP är densamma som andra ser den som (ingen portmappning krävs mellan poddar).
+
+Hur det fungerar i praktiken:
+
+    Realiseras av ett CNI-plugin (Container Network Interface, t.ex. Cilium, Calico eller Flannel).
+
+    CNI sätter upp virtuella nätverksgränssnitt (veth-par) som binder samman poddens nätverksnamnrymd med nodens nätverk.
+
+# Se tilldelade pod-IPs och vilken nod de schemalagts på
+    
+    kubectl get pods -o wide
+
+# Testa kommunikation direkt mellan två poddar via IP
+
+    kubectl exec -it <pod-a> -- ping <pod-b-ip>
 
 ## Host network
+
+När en pod konfigureras med hostNetwork: true delar den nätverksnamnrymd direkt med den underliggande noden istället för att få ett eget isolerat namespace.
+Typiska användningsområden:
+
+Systemnära infrastrukturkomponenter och CNI-agenter som måste konfigurera nätverket på själva noden.
+
+Ingress controllers eller lastbalanserare som behöver direkt tillgång till nodens externa IP/portar utan kube-proxy-overhead.
+
+DaemonSets för nätverksövervakning eller telemetri.
 
 # Namespaces
 
