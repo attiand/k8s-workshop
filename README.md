@@ -270,10 +270,6 @@ Git-ops
 
 ## ApplicationSet
 
-# Vault
-
-## External secrets
-
 Retention
 
 # Logs
@@ -312,7 +308,5 @@ Fixa access, hämta k8s config.
 ## DHI (Docker hardened images)
 
 # AI support
-
-## KubeGPT
 
 ## K8sGPT
