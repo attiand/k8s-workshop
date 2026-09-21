@@ -250,8 +250,6 @@ Monterade som filer (Volumes):
 
 Standard för certifikat, nycklar eller större hemligheter. Kubernetes monterar dem som en tmpfs (RAM-baserad volym i minnet) så att de aldrig skrivs till nodens fysiska disk.
 
-## Jobs
-
 ## Labels
 
 Labels are strictly for identifying and selecting objects. Because they are used for querying, they have strict syntax rules (e.g., keys and values are limited to 63 characters).
@@ -346,8 +344,8 @@ Visibility: Argo CD provides a web UI that visualizes all your running applicati
 ## Application
 
 * Source
- * ~~Helm repository URL~~
- * Git branch + path (looks for a `Chart.yaml` or `kustomization.yaml`)
+  * Git branch + path (looks for file `Chart.yaml` or `kustomization.yaml`)
+  * ~~Helm repository URL~~
 * Destination (cluster to sync)
 * Sync Policy (automatic or manual)
 
@@ -380,6 +378,8 @@ Fixa access, hämta k8s config.
 
 ## Kyverno
 
+* validate-limits policy
+
 ## Grafana
 
 ## S3
@@ -390,10 +390,13 @@ Fixa access, hämta k8s config.
 
 ## DHI (Docker hardened images)
 
-# AI support
+https://hub.docker.com/hardened-images/catalog
 
-## K8sGPT
+DHI Community (Free) and DHI Select & Enterprise (Paid)
 
-Ett LLM verktyg som kan analysera kluster automatiskt och spotta ur sig en lista över fel som den tycker sig hitta.
+* Stripped images down to minimize their security attack surface
+* Signed by Docker
+* Non-Root Execution
+* Stripped Permissions
 
-(visa exempel)
+
