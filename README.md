@@ -68,6 +68,20 @@ DaemonSets för nätverksövervakning eller telemetri.
 
 # Ingress
 
+Ingress är Kubernetes inbyggda sätt att exponera HTTP- och HTTPS-tjänster mot omvärlden via en gemensam ingång på applikationslagret (Layer 7).
+
+Istället för att varje mikrotjänst kräver en egen extern lastbalanserare eller publik port, fungerar Ingress Controllern som en central reverse proxy och router inuti klustret.
+
+I många on-prem- eller bare-metal-miljöer släpper man inte in extern trafik rakt på poddarna. Istället kopplas en extern lastbalanserare ihop med Ingress Controllern via NodePort:
+
+Klient / Användare anropar publik domän (t.ex. app.exempel.se).
+
+Extern Lastbalanserare (LB): Tar emot trafiken på standardportar (80/443), hanterar eventuell extern failover/hälsa och skickar trafiken vidare till klustrets noder via en tilldelad NodePort (t.ex. port 30080 / 30443).
+
+Ingress Controller (t.ex. Traefik ): Lyssnar på den specifika NodePort-tjänsten på alla noder i klustret och tar emot trafiken.
+
+Ingress-resurser (Reglerna): Controllern matchar inkommande HTTP-header (Host, sökväg, TLS) mot definierade Ingress-regler och routar trafiken direkt till rätt intern Service/Pod IP.
+
 # Load balancer
 
 Att förstå hur extern trafik når våra tjänster i Kubernetes handlar om att följa användarens anrop hela vägen in till rätt applikations-pod. Vår arkitektur bygger på tre centrala lager: DNS/VIP, NodePorts och Traefik Ingress Controller.
@@ -111,9 +125,54 @@ Trafiken skickas slutligen direkt till mål-poddens interna IP.
 
 ## Service
 
-Fully qualified domain name. Reduces configuration.
+En Service är en nätverksabstraktion framför en dynamisk uppsättning poddar. 
 
-```<namespace>.svc.cluster.local```
+Eftersom poddar är förgängliga och får nya IP-adresser när de startas om eller skalas, ger en Service en fast intern IP och ett stabilt DNS-namn.
+
+Kubernetes inbyggda DNS-server (t.ex. CoreDNS) skapar automatiskt DNS-poster för varje Service. Detta minimerar hårdkodad nätverkskonfiguration mellan mikrotjänster.
+
+Ett komplett FQDN har alltid formatet:
+
+<service-name>.<namespace>.svc.cluster.local
+
+Hur anrop förenklas inom klustret:
+
+Samma namespace: En pod i samma namespace kan anropa enbart tjänstens namn
+
+    curl http://backend:8080
+
+Annat namespace: En pod i ett annat namespace anger servicenamn och namespace
+
+    curl http://backend.prod:8080
+
+Fullständigt (FQDN): Används vid explicita behov eller för att undvika DNS-sökdomän-uppslag
+
+    curl http://backend.prod.svc.cluster.local:8080
+
+Precis som poddar har sitt eget nät (Pod CIDR), tilldelas Services virtuella IP-adresser ur ett eget dedikerat subnät som kallas Service CIDR.
+
+Standard i k3s är 10.43.0.0/16 (konfigureras via --service-cidr vid klusterinstallation).
+
+Service-IP (ClusterIP) är inte bunden till något fysiskt eller virtuellt nätverkskort på noderna.
+
+Det är kube-proxy (eller CNI via eBPF/iptables) som fångar upp trafik adresserad till Service CIDR och lastbalanserar den direkt vidare till rätt underliggande Pod-IP.
+
+Vanliga Service-Typer
+
+    ClusterIP: (Standard) Får en intern IP ur Service CIDR. Endast nåbar inifrån klustret.
+
+    NodePort: Öppnar en statisk port (standard 30000–32767) på alla noder. Vidarebefordrar trafiken till en underliggande ClusterIP.
+
+    LoadBalancer: Bygger på NodePort men begär en extern lastbalanserare från underliggande moln/infrastruktur.
+
+    Headless Service (clusterIP: None): Tilldelas ingen virtuell IP alls. DNS-anrop returnerar istället A-records direkt till de matchande poddarnas IP-adresser.
+
+# Lista services i ett namespace (visar ClusterIP, portar och typ)
+    kubectl get svc -n backend
+
+# Se vilka faktiska pod-IPs som servicen pekar ut just nu
+    kubectl get endpoints api-service -n backend
+
 
 ## CM (Config Maps)
 
