@@ -66,6 +66,31 @@ DaemonSets för nätverksövervakning eller telemetri.
 
 # Namespaces
 
+Ett Namespace är ett sätt att dela upp och isolera resurser inom ett och samma Kubernetes-kluster. 
+
+Det fungerar som ett virtuellt kluster inuti klustret för att separera miljöer, team eller projekt.
+
+Vad namespaces ger
+
+    Namnrymdsisolering: Olika namespaces kan ha resurser med identiska namn (t.ex. en service som heter web i både dev och prod).
+
+    Nätverksadressering: Påverkar DNS – interna anrop mellan tjänster i samma namespace kräver bara kortnamnet (backend), medan anrop över gränserna kräver backend.namespace
+
+    Åtkomstkontroll (RBAC): Rättigheter kan begränsas till ett specifikt namespace så att ett team bara kan administrera sina egna resurser.
+
+    Resursstyrning: Möjlighet att sätta gränser för CPU, minne och antal objekt via ResourceQuota och LimitRange.
+
+# Lista alla befintliga namespaces
+    kubectl get namespaces
+
+    kubectl get ns
+
+# Skapa ett nytt namespace
+    kubectl create namespace workshop-demo
+
+# Kör ett kommando mot ett specifikt namespace
+    kubectl get pods -n workshop-demo
+
 # Ingress
 
 Ingress är Kubernetes inbyggda sätt att exponera HTTP- och HTTPS-tjänster mot omvärlden via en gemensam ingång på applikationslagret (Layer 7).
