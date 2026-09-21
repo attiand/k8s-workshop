@@ -12,17 +12,23 @@ En Node är en fysisk eller virtuell maskin som utgör själva beräkningskapaci
 Det är här alla containers/poddar faktiskt körs. Varje nod hanteras av kontrollplanet (Control Plane) och kör de nödvändiga komponenterna för att driva containers: 
 kubelet (nodagenten), en container runtime (t.ex. containerd eller CRI-O) samt kube-proxy (nätverkshantering).
 
-Lista alla noder och deras status
+Lista alla noder och deras status:
 
-    kubectl get nodes
+```bash
+kubectl get nodes
+```
 
-Beskriv en nod, bra för att kolla ev fel på noden
+Beskriv en nod, bra för att kolla ev fel på noden:
 
-    kubectl describe node <nodnamn>
+```bash
+kubectl describe node <nodnamn>
+```
 
-Om man vill se en snapp överblick över CPU och Minnesanvändning så finns också top
+Om man vill se en snabb överblick över CPU och Minnesanvändning så finns också top:
 
-    kubectl top nodes
+```bash
+kubectl top nodes
+```
 
 # Network
 
@@ -33,25 +39,29 @@ adress ur ett dedikerat subnät (Pod CIDR som ställs in vid installation av k3s
 
 Grundregler för pod-nätverket:
 
-    Alla poddar kan kommunicera med alla andra poddar på alla noder utan NAT (Network Address Translation).
+* Alla poddar kan kommunicera med alla andra poddar på alla noder utan NAT (Network Address Translation).
 
-    Agenten på en nod (t.ex. kubelet) kan kommunicera med alla poddar på samma nod.
+* Agenten på en nod (t.ex. kubelet) kan kommunicera med alla poddar på samma nod.
 
-    Poddens egen IP är densamma som andra ser den som (ingen portmappning krävs mellan poddar).
+* Poddens egen IP är densamma som andra ser den som (ingen portmappning krävs mellan poddar).
 
 Hur det fungerar i praktiken:
 
-    Realiseras av ett CNI-plugin (Container Network Interface, t.ex. Cilium, Calico eller Flannel).
+* Realiseras av ett CNI-plugin (Container Network Interface, t.ex. Cilium, Calico eller Flannel).
 
-    CNI sätter upp virtuella nätverksgränssnitt (veth-par) som binder samman poddens nätverksnamnrymd med nodens nätverk.
+* CNI sätter upp virtuella nätverksgränssnitt (veth-par) som binder samman poddens nätverksnamnrymd med nodens nätverk.
 
 # Se tilldelade pod-IPs och vilken nod de schemalagts på
-    
-    kubectl get pods -o wide
+
+```bash
+kubectl get pods -o wide
+```
 
 # Testa kommunikation direkt mellan två poddar via IP
 
-    kubectl exec -it <pod-a> -- ping <pod-b-ip>
+```bash
+kubectl exec -it <pod-a> -- ping <pod-b-ip>
+```
 
 ## Host network
 
@@ -72,24 +82,33 @@ Det fungerar som ett virtuellt kluster inuti klustret för att separera miljöer
 
 Vad namespaces ger
 
-    Namnrymdsisolering: Olika namespaces kan ha resurser med identiska namn (t.ex. en service som heter web i både dev och prod).
+* Namnrymdsisolering: Olika namespaces kan ha resurser med identiska namn (t.ex. en service som heter web i både dev och prod).
 
-    Nätverksadressering: Påverkar DNS – interna anrop mellan tjänster i samma namespace kräver bara kortnamnet (backend), medan anrop över gränserna kräver backend.namespace
+* Nätverksadressering: Påverkar DNS – interna anrop mellan tjänster i samma namespace kräver bara kortnamnet (backend), medan anrop över gränserna kräver backend.namespace
 
-    Åtkomstkontroll (RBAC): Rättigheter kan begränsas till ett specifikt namespace så att ett team bara kan administrera sina egna resurser.
+* Åtkomstkontroll (RBAC): Rättigheter kan begränsas till ett specifikt namespace så att ett team bara kan administrera sina egna resurser.
 
-    Resursstyrning: Möjlighet att sätta gränser för CPU, minne och antal objekt via ResourceQuota och LimitRange.
+* Resursstyrning: Möjlighet att sätta gränser för CPU, minne och antal objekt via ResourceQuota och LimitRange.
 
 # Lista alla befintliga namespaces
-    kubectl get namespaces
 
-    kubectl get ns
+```bash
+kubectl get namespaces
+
+kubectl get ns
+```
 
 # Skapa ett nytt namespace
-    kubectl create namespace workshop-demo
+
+```bash
+kubectl create namespace workshop-demo
+``` 
 
 # Kör ett kommando mot ett specifikt namespace
-    kubectl get pods -n workshop-demo
+
+```bash
+kubectl get pods -n workshop-demo
+```
 
 # Ingress
 
@@ -158,25 +177,32 @@ Kubernetes inbyggda DNS-server (t.ex. CoreDNS) skapar automatiskt DNS-poster fö
 
 Ett komplett FQDN har alltid formatet:
 
-<service-name>.<namespace>.svc.cluster.local
+`<service-name>.<namespace>.svc.cluster.local`
 
 Hur anrop förenklas inom klustret:
 
 Samma namespace: En pod i samma namespace kan anropa enbart tjänstens namn
 
-    curl http://backend:8080
+
+```bash
+curl http://backend:8080
+```
 
 Annat namespace: En pod i ett annat namespace anger servicenamn och namespace
 
-    curl http://backend.prod:8080
+```bash
+curl http://backend.prod:8080
+```
 
 Fullständigt (FQDN): Används vid explicita behov eller för att undvika DNS-sökdomän-uppslag
 
-    curl http://backend.prod.svc.cluster.local:8080
+```bash
+curl http://backend.prod.svc.cluster.local:8080
+```
 
 Precis som poddar har sitt eget nät (Pod CIDR), tilldelas Services virtuella IP-adresser ur ett eget dedikerat subnät som kallas Service CIDR.
 
-Standard i k3s är 10.43.0.0/16 (konfigureras via --service-cidr vid klusterinstallation).
+Standard i k3s är `10.43.0.0/16` (konfigureras via --service-cidr vid klusterinstallation).
 
 Service-IP (ClusterIP) är inte bunden till något fysiskt eller virtuellt nätverkskort på noderna.
 
@@ -184,20 +210,25 @@ Det är kube-proxy (eller CNI via eBPF/iptables) som fångar upp trafik adresser
 
 Vanliga Service-Typer
 
-    ClusterIP: (Standard) Får en intern IP ur Service CIDR. Endast nåbar inifrån klustret.
+* ClusterIP: (Standard) Får en intern IP ur Service CIDR. Endast nåbar inifrån klustret.
 
-    NodePort: Öppnar en statisk port (standard 30000–32767) på alla noder. Vidarebefordrar trafiken till en underliggande ClusterIP.
+* NodePort: Öppnar en statisk port (standard 30000–32767) på alla noder. Vidarebefordrar trafiken till en underliggande ClusterIP.
 
-    LoadBalancer: Bygger på NodePort men begär en extern lastbalanserare från underliggande moln/infrastruktur.
+* LoadBalancer: Bygger på NodePort men begär en extern lastbalanserare från underliggande moln/infrastruktur.
 
-    Headless Service (clusterIP: None): Tilldelas ingen virtuell IP alls. DNS-anrop returnerar istället A-records direkt till de matchande poddarnas IP-adresser.
+* Headless Service (clusterIP: None): Tilldelas ingen virtuell IP alls. DNS-anrop returnerar istället A-records direkt till de matchande poddarnas IP-adresser.
 
 # Lista services i ett namespace (visar ClusterIP, portar och typ)
-    kubectl get svc -n backend
+
+```bash
+kubectl get svc -n backend
+```
 
 # Se vilka faktiska pod-IPs som servicen pekar ut just nu
-    kubectl get endpoints api-service -n backend
 
+```bash
+kubectl get endpoints api-service -n backend
+```
 
 ## CM (Config Maps)
 
