@@ -203,6 +203,22 @@ Vanliga Service-Typer
 
 ## Secrets
 
+En Secret är ett Kubernetes-objekt avsett för att lagra och hantera känslig data – såsom lösenord, tokens, API-nycklar och SSH/TLS-certifikat 
+
+– utan att hårdkoda dem i container-images eller pod-specar.
+
+Vi använder external-secret-operator som gör att vi kan lagra hemligheterna i Hashicorp Vault och sedan mappa detta till kubernetes secrets.
+
+Det finns två vanliga sätt att ge en container tillgång till en Secret:
+
+Som miljövariabler (Environment Variables):
+
+Bra för enkla lösenord eller konfigurationssträngar.
+
+Monterade som filer (Volumes):
+
+Standard för certifikat, nycklar eller större hemligheter. Kubernetes monterar dem som en tmpfs (RAM-baserad volym i minnet) så att de aldrig skrivs till nodens fysiska disk.
+
 ## Jobs
 
 ## Labels
