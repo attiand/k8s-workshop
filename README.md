@@ -223,7 +223,25 @@ Standard för certifikat, nycklar eller större hemligheter. Kubernetes monterar
 
 ## Labels
 
+Labels are strictly for identifying and selecting objects. Because they are used for querying, they have strict syntax rules (e.g., keys and values are limited to 63 characters).
+
+```bash
+kubectl get pods  --show-labels
+```
+
+List pods with a specific label:
+
+```bash
+kubectl get pods -l sub-system=mind
+```
+
 ## Annotations
+
+Annotations are used to store non-identifying metadata (like a build ID, a commit hash, or configuration settings for a third-party tool). They can hold much larger amounts of data, but you cannot use a selector to filter objects based on an annotation.
+
+```bash
+kubectl describe pod my-pod
+```
 
 # Helm
 
@@ -243,6 +261,15 @@ helm template .
 kubectl kustomize --enable-helm .
 ```
 
+# Storage
+
+* PVC
+* PV
+
+Retention
+
+## Longhorn
+
 # Operators
 
 An Operator is a specialized, domain-specific Controller.
@@ -250,27 +277,52 @@ An Operator is a specialized, domain-specific Controller.
 ## Controller
 A Controller is a native, general-purpose Kubernetes automation loop. It manages standard, built-in Kubernetes resources
 
+Example: [CNPG](https://cloudnative-pg.io/)
 
-Example CNPG
+## Custom resources (CRD)
 
-## Custom resources
+Allows you to extend the Kubernetes API with your own custom objects, allowing Kubernetes to manage them exactly as it manages native, built-in resources like Pods, Deployments, or Services.
 
-# Storage
+Example: [CNPG Cluster](cnpg/simple-cluster.yaml)
 
-* PVC
-* PV
+```bash
+kubectl get crds
 
-### Longhorn
+kubectl get clusters.postgresql.cnpg.io
+```
 
 # ArgoCD
 
-Git-ops
+Git-ops, The Git repository is the single source of truth.
+
+Operator loop:
+ 1. Check specified repositories for new commits.
+ 2. Detecting drift.
+ 3. Automatic (or manual) synchronisation.
+
+## Key Benefits
+
+Automated Deployments: No need to write deployment scripts. Argo CD handles the deployment automatically.
+
+Instant Rollbacks: Rolling back is as simple as reverting the commit in Git.
+
+Better Security: Argo CD pulls configurations from Git, you don't need to give your CI pipeline direct administrative access to your Kubernetes cluster.
+
+Disaster Recovery: If your Kubernetes cluster goes down or needs to be rebuilt, you don't lose any configuration. Spin up a new cluster, point Argo CD to your Git repository, and it will recreate the entire environment exactly as it was.
+
+Visibility: Argo CD provides a web UI that visualizes all your running application resources.
 
 ## Application
 
+* Source
+ * ~~Helm repository URL~~
+ * Git branch + path (looks for a `Chart.yaml` or `kustomization.yaml`)
+* Destination (cluster to sync)
+* Sync Policy (automatic or manual)
+
 ## ApplicationSet
 
-Retention
+Operator that creates ArgoCD application from a directory or file structure.
 
 # Logs
 
