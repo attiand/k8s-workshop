@@ -109,9 +109,17 @@ Trafiken skickas slutligen direkt till mål-poddens interna IP.
 
 # Resources
 
-* CM (Config Maps)
-* Secrets
-* Jobs
+## Service
+
+Fully qualified domain name. Reduces configuration.
+
+```<namespace>.svc.cluster.local```
+
+## CM (Config Maps)
+
+## Secrets
+
+## Jobs
 
 ## Labels
 
@@ -119,11 +127,29 @@ Trafiken skickas slutligen direkt till mål-poddens interna IP.
 
 # Helm
 
+Helm is the official package manager for Kubernetes. Go template language.
+
+## Dry run
+
+```bash
+helm template .
+```
+
 # Kustomize
+
+## Dry run
+
+```bash
+kubectl kustomize --enable-helm .
+```
 
 # Operators
 
-vs Controller
+An Operator is a specialized, domain-specific Controller.
+
+## Controller
+A Controller is a native, general-purpose Kubernetes automation loop. It manages standard, built-in Kubernetes resources
+
 
 Example CNPG
 
@@ -154,25 +180,61 @@ Retention
 
 ## Loki
 
-Fluent bit
+* Fluent bit
+* S3 storage
 
 # Kyverno
+
+Policy engine, https://kyverno.io
+
+* Pull images from `docker.nya-srv.its.umu.se` only.
+* Verify image signature
+* Resource limits
+
+## Available policies
+
+https://kyverno.io/policies/
+
+## Get cluster policys
+
+```bash
+kubectl describe cpol -n kyverno
+```
+
+## Get all reports
+
+```bash
+kubectl get policyreports -A
+```
 
 ## Resource limits
 
 ### Request
 
+Tells the Kubernetes scheduler how much CPU and memory a container must have available.
+
+The scheduler adds up the requests of all containers in a Pod and searches for a Node with enough unallocated capacity. If no Node has enough capacity, the Pod remains in a Pending state.
+
 ### Limits
+
+Tells the container runtime the hard maximum amount of CPU and memory the container is allowed to use.
+
+## Debug Container
+
+[Debug Container](debug.md)
 
 # Orange
 
- * k3s
-   * Rancher
- * Kyverno
- * Grafana
- * S3
+## k3s
 
-Fixa access
+### Rancher
+Fixa access, hämta k8s config.
+
+## Kyverno
+
+## Grafana
+
+## S3
 
 # Non K8S
 

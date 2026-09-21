@@ -2,7 +2,7 @@
 
 https://medium.com/@muppedaanvesh/deploying-nginx-on-kubernetes-a-quick-guide-04d533414967
 
-## Setup Kind
+## Create Kind cluster
 
 https://kind.sigs.k8s.io
 
@@ -48,7 +48,7 @@ curl localhost:8080
 kubectl delete pod nginx-pod
 ```
 
-## Create deployment & Service
+## Create Deployment & Service
 
 * Skapa filen [deploment.yaml](lab/1/deployment.yaml)
 * Skapa filen [serice.yaml](lab/1/service.yaml)
@@ -68,13 +68,23 @@ curl localhost:8080
 
 ### Commands
 
-* get (get -o yaml)
-* describe
-* logs
-* delete
-* apply
-* top
-* exec
+```bash
+kubectl get pods
+
+kubectl get pods -o wide
+
+kubectl get pod nginx-deployment-756d4cb589-qftt6
+
+kubectl get pod -o yaml nginx-deployment-756d4cb589-qftt6
+
+kubectl describe pod nginx-deployment-756d4cb589-qftt6
+
+kubectl describe svc nginx-svc
+
+kubectl logs nginx-deployment-756d4cb589-qftt6
+
+kubectl exec -it nginx-deployment-756d4cb589-qftt6 -- sh
+```
 
 ## Replicas
 
@@ -104,5 +114,10 @@ kubectl delete -f service.yaml
 kubectl delete -f deployment.yaml
 ```
 
-## Debug Container
+## Delete Kind Cluster
 
+```bash
+kind delete cluster --name mycluster
+
+rm ~/.kube/mycluster.yaml
+```
