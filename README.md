@@ -387,23 +387,23 @@ Den förvandlar lokal lagring på klusternoder till ett feltåligt, replikerat o
 
 Hur Longhorn fungerar i praktiken
 
-    * Synkron replikering: Varje volym delas upp i ett definierat antal kopior (replikor, ofta 3 stycken som standard) som sprids ut över olika noder i klustret.
+* Synkron replikering: Varje volym delas upp i ett definierat antal kopior (replikor, ofta 3 stycken som standard) som sprids ut över olika noder i klustret.
 
-    * Microservices per volym: Longhorn kör en dedikerad controller och volymmotor per aktiv volym via containrar på noderna.
+* Microservices per volym: Longhorn kör en dedikerad controller och volymmotor per aktiv volym via containrar på noderna.
 
-    * iSCSI i botten: Poddar ansluter till sina volymer via nodens lokala iSCSI-interface som skapats av Longhorns CSI-driver.
+* iSCSI i botten: Poddar ansluter till sina volymer via nodens lokala iSCSI-interface som skapats av Longhorns CSI-driver.
 
-    * Om en nod med en körande pod dör kan Kubernetes schemalägga om podden till en annan nod, och Longhorn ansluter omedelbart till en av de befintliga replikerna där.
+* Om en nod med en körande pod dör kan Kubernetes schemalägga om podden till en annan nod, och Longhorn ansluter omedelbart till en av de befintliga replikerna där.
 
 Centrala funktioner
 
-    * Inbyggd StorageClass: Registrerar automatiskt longhorn som lagringsklass, vilket gör det enkelt att dynamiskt provisionera PV:er via vanliga PVC:er.
+* Inbyggd StorageClass: Registrerar automatiskt longhorn som lagringsklass, vilket gör det enkelt att dynamiskt provisionera PV:er via vanliga PVC:er.
 
-    * Snapshots och Backups: Inbyggt stöd för schemalagda snapshots lokalt samt asynkrona backuper till extern S3-kompatibel lagring eller NFS.
+* Snapshots och Backups: Inbyggt stöd för schemalagda snapshots lokalt samt asynkrona backuper till extern S3-kompatibel lagring eller NFS.
 
-    * Webb-UI
+* Webb-UI
 
-    * Stöd för ReadWriteMany (RWX): Kan via en integrerad NFS-server erbjuda volymer som delas mellan flera noder samtidigt.
+* Stöd för ReadWriteMany (RWX): Kan via en integrerad NFS-server erbjuda volymer som delas mellan flera noder samtidigt.
 
 # Operators
 
