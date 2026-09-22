@@ -346,12 +346,64 @@ kubectl apply -k --enable-helm .
 
 # Storage
 
-* PVC
-* PV
+Kubernetes hanterar lagring genom att frikoppla applikationens behov av disk från den underliggande lagringsinfrastrukturen. 
 
-Retention
+Detta görs via två centrala byggstenar: PersistentVolume (PV) och PersistentVolumeClaim (PVC).
+
+PV vs PVC
+
+PersistentVolume (PV):
+
+Den faktiska lagringsresursen (t.ex. lokal disk, NFS, iSCSI eller ett SAN-block).
+
+    *   Är klusterövergripande (tillhör inte ett namespace).
+
+    *   Skapas antingen statiskt av en klusteradministratör eller dynamiskt via en StorageClass.
+
+PersistentVolumeClaim (PVC):
+
+    *   En beställning från en användare/pod.
+
+    *   Är bunden till ett specifikt namespace.
+
+    *   Specificerar behov: storlek (t.ex. 10Gi), access mode och eventuell StorageClass.
+
+När en PVC skapas letar Kubernetes efter en matchande PV och binder dem till varandra (status: Bound) i en 1:1-relation.
+
+Access Modes - Anger hur volymen får monteras av noder
+
+    *   RWO - ReadWriteOnce monteras för läsning och skrivning av en enskild nod åt gången (vanligt för blocklagring/lokal disk)
+
+    *   ROX - ReadOnlyMany monteras som skrivskyddad av många noder samtidigt
+
+    *   RWX - ReadWriteMany monteras för läsning och skrivning av flera noder samtidigt (kräver filsystem som t.ex. NFS).
+
 
 ## Longhorn
+
+Longhorn är en distribuerad blocklagringslösning med öppen källkod som är designad direkt för Kubernetes. 
+
+Den förvandlar lokal lagring på klusternoder till ett feltåligt, replikerat och distribuerat lagringsnätverk.
+
+Hur Longhorn fungerar i praktiken
+
+    * Synkron replikering: Varje volym delas upp i ett definierat antal kopior (replikor, ofta 3 stycken som standard) som sprids ut över olika noder i klustret.
+
+    * Microservices per volym: Longhorn kör en dedikerad controller och volymmotor per aktiv volym via containrar på noderna.
+
+    * iSCSI i botten: Poddar ansluter till sina volymer via nodens lokala iSCSI-interface som skapats av Longhorns CSI-driver.
+
+    * Om en nod med en körande pod dör kan Kubernetes schemalägga om podden till en annan nod, och Longhorn ansluter omedelbart till en av de befintliga replikerna där.
+
+Centrala funktioner
+
+    * Inbyggd StorageClass: Registrerar automatiskt longhorn som lagringsklass, vilket gör det enkelt att dynamiskt provisionera PV:er via vanliga PVC:er.
+
+    * Snapshots och Backups: Inbyggt stöd för schemalagda snapshots lokalt samt asynkrona backuper till extern S3-kompatibel lagring eller NFS.
+
+    * Webb-UI
+
+    * Stöd för ReadWriteMany (RWX): Kan via en integrerad NFS-server erbjuda volymer som delas mellan flera noder samtidigt.
 
 # Operators
 
