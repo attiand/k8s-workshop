@@ -1,6 +1,7 @@
 # General 
 
-https://www.alibabacloud.com/blog/getting-started-with-kubernetes-%7C-kubernetes-container-runtime-interface_596339 
+* https://aws.plainenglish.io/kubectl-get-kubernetes-o-architecture-6d4bd97dcaaf
+* https://iximiuz.com/en/tags/?tag=nerdctl
 
 # Lab
 

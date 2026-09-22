@@ -8,7 +8,6 @@ https://kind.sigs.k8s.io
 
 ```bash
 kind create cluster --name mycluster
-kind get kubeconfig --name mycluster > ~/.kube/mycluster.yaml
 ```
 
 ## Config
@@ -118,6 +117,4 @@ kubectl delete -f deployment.yaml
 
 ```bash
 kind delete cluster --name mycluster
-
-rm ~/.kube/mycluster.yaml
 ```
