@@ -356,27 +356,27 @@ PersistentVolume (PV):
 
 Den faktiska lagringsresursen (t.ex. lokal disk, NFS, iSCSI eller ett SAN-block).
 
-    *   Är klusterövergripande (tillhör inte ett namespace).
+*   Är klusterövergripande (tillhör inte ett namespace).
 
-    *   Skapas antingen statiskt av en klusteradministratör eller dynamiskt via en StorageClass.
+*   Skapas antingen statiskt av en klusteradministratör eller dynamiskt via en StorageClass.
 
 PersistentVolumeClaim (PVC):
 
-    *   En beställning från en användare/pod.
+*   En beställning från en användare/pod.
 
-    *   Är bunden till ett specifikt namespace.
+*   Är bunden till ett specifikt namespace.
 
-    *   Specificerar behov: storlek (t.ex. 10Gi), access mode och eventuell StorageClass.
+*   Specificerar behov: storlek (t.ex. 10Gi), access mode och eventuell StorageClass.
 
 När en PVC skapas letar Kubernetes efter en matchande PV och binder dem till varandra (status: Bound) i en 1:1-relation.
 
 Access Modes - Anger hur volymen får monteras av noder
 
-    *   RWO - ReadWriteOnce monteras för läsning och skrivning av en enskild nod åt gången (vanligt för blocklagring/lokal disk)
+*   RWO - ReadWriteOnce monteras för läsning och skrivning av en enskild nod åt gången (vanligt för blocklagring/lokal disk)
 
-    *   ROX - ReadOnlyMany monteras som skrivskyddad av många noder samtidigt
+*   ROX - ReadOnlyMany monteras som skrivskyddad av många noder samtidigt
 
-    *   RWX - ReadWriteMany monteras för läsning och skrivning av flera noder samtidigt (kräver filsystem som t.ex. NFS).
+*   RWX - ReadWriteMany monteras för läsning och skrivning av flera noder samtidigt (kräver filsystem som t.ex. NFS).
 
 
 ## Longhorn
