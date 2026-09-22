@@ -13,7 +13,8 @@ https://kyverno.io/policies/
 ## Get cluster policys
 
 ```bash
-kubectl describe cpol -n kyverno
+kubectl get cpol
+kubectl describe cpol <policy-name>
 ```
 
 ## Get all reports
