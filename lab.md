@@ -49,7 +49,7 @@ kubectl delete pod nginx-pod
 
 ## Create Deployment & Service
 
-* Skapa filen [deploment.yaml](lab/1/deployment.yaml)
+* Skapa filen [deployment.yaml](lab/1/deployment.yaml)
 * Skapa filen [serice.yaml](lab/1/service.yaml)
 
 ```bash
@@ -105,7 +105,7 @@ The pod is recreated.
 
 ```bash
 kubectl delete svc nginx-svc
-kubectl delete deploment nginx-deployment
+kubectl delete deployment nginx-deployment
 ```
 or:
 ```bash

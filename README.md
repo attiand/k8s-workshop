@@ -531,6 +531,16 @@ Set up access, fetch k8s config.
 
 ## S3
 
+Amazon S3 (Simple Storage Service) is a highly scalable, cloud-based object storage service.
+
+Object Storage: It saves files as "objects" inside containers called "buckets" rather than a traditional folder hierarchy.
+
+Key: The unique name of the object. This is how you identify and retrieve the data, ex `images/2026/summer/vacation.jpg`
+
+Value: The actual raw data you are storing (the bytes of the photo, video, or document)
+
+Metadata: A set of name-value pairs that describe the object
+
 ## DHI (Docker hardened images)
 
 https://hub.docker.com/hardened-images/catalog
@@ -542,4 +552,4 @@ DHI Community (Free) and DHI Select & Enterprise (Paid)
 * Non-Root Execution
 * Stripped Permissions
 
-
+Special registry name `dhi.nya-srv.its.umu.se`
