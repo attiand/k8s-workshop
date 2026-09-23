@@ -185,7 +185,7 @@ Traefik is exposed internally in the cluster via a Kubernetes Service of type No
 
 A NodePort opens the same port range on all worker nodes in the cluster:
 
-Corresponding to port 80 & 443: Web traffic (HTTP and HTTPS).
+Nodeports are in the 30000–32767 range, so nodeport 30443 could correspond to 443 and 30080 could correspond to 80 depending on setup.
 
 Dedicated ports: Non-HTTP traffic (e.g. SSH, activemq-artemis and similar).
 
