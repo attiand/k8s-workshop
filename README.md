@@ -7,6 +7,41 @@
 
 [lab](lab.md)
 
+
+# Pod
+
+Smallest and most basic deployable unit. Contains one or more containers. Typically one main container and auxiliary init containers or Sidecars.
+
+* All containers within a single Pod share the exact same IP address and port space. Because they share a network namespace, they can communicate with each other using localhost.
+
+* Shared Storage: A Pod can specify a set of shared storage Volumes. All containers in that Pod can mount and access these volumes, allowing them to share data seamlessly.
+
+* Ephemeral Lifecycle: Pods are mortal and disposable. If a Pod crashes, dies, or its host node fails, Kubernetes does not "fix" it. Instead, it throws the dead Pod away and spins up a new one to replace it.
+
+## Init container
+
+* Run to completion
+
+* Run sequentially
+
+* Block app startup. The main containers in the Pod will not start until all init containers have finished successfully.
+
+* Failure restarts the Pod.
+
+### Common init container use cases
+
+* Waiting for dependencies
+
+* Running database migrations
+
+* Populating shared volumes
+
+* Security and Permissions: An init container can run with higher privileges (like root) to change file permissions on a volume, allowing the main application container to run much more securely as a non-root user.
+
+## Sidecar
+
+Common sidecar use cases: Log Forwarding, Service Mesh Proxies, Monitoring & Metrics and Configuration Syncing.
+
 # Nodes
 
 En Node är en fysisk eller virtuell maskin som utgör själva beräkningskapaciteten i ett Kubernetes-kluster. 
