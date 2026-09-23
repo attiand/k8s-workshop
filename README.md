@@ -26,7 +26,7 @@ Smallest and most basic deployable unit. Contains one or more containers. Typica
 
 * Block app startup. The main containers in the Pod will not start until all init containers have finished successfully.
 
-* Failure restarts the Pod.
+* Failure can restart the Pod depending on configuration.
 
 ### Common init container use cases
 
@@ -300,7 +300,7 @@ Standard for certificates, keys or larger secrets. Kubernetes mounts them as a t
 
 ## Labels
 
-Labels are strictly for identifying and selecting objects. Because they are used for querying, they have strict syntax rules (e.g., keys and values are limited to 63 characters).
+Labels are strictly for identifying and selecting objects. Because they are used for querying, they have strict syntax rules (e.g., keys and values have limited length).
 
 ```bash
 kubectl get pods  --show-labels
@@ -469,7 +469,7 @@ Git-ops, The Git repository is the single source of truth.
 Operator loop:
  1. Check specified repositories for new commits.
  2. Detecting drift.
- 3. Automatic (or manual) synchronisation.
+ 3. Automatic (or manual) synchronization.
 
 ## Key Benefits
 
