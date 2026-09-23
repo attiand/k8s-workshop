@@ -42,6 +42,12 @@ Smallest and most basic deployable unit. Contains one or more containers. Typica
 
 Common sidecar use cases: Log Forwarding, Service Mesh Proxies, Monitoring & Metrics and Configuration Syncing.
 
+## Health
+
+Liveness Probe: These continuously check if the application is alive.
+
+Readiness Probes: Can it serve traffic?
+
 # Nodes
 
 A Node is a physical or virtual machine that provides the actual compute capacity in a Kubernetes cluster.
