@@ -44,23 +44,23 @@ Common sidecar use cases: Log Forwarding, Service Mesh Proxies, Monitoring & Met
 
 # Nodes
 
-En Node är en fysisk eller virtuell maskin som utgör själva beräkningskapaciteten i ett Kubernetes-kluster. 
-Det är här alla containers/poddar faktiskt körs. Varje nod hanteras av kontrollplanet (Control Plane) och kör de nödvändiga komponenterna för att driva containers: 
-kubelet (nodagenten), en container runtime (t.ex. containerd eller CRI-O) samt kube-proxy (nätverkshantering).
+A Node is a physical or virtual machine that provides the actual compute capacity in a Kubernetes cluster.
+This is where all containers/pods actually run. Each node is managed by the Control Plane and runs the components required to operate containers:
+kubelet (the node agent), a container runtime (e.g. containerd or CRI-O) and kube-proxy (network management).
 
-Lista alla noder och deras status:
+List all nodes and their status:
 
 ```bash
 kubectl get nodes
 ```
 
-Beskriv en nod, bra för att kolla ev fel på noden:
+Describe a node, useful for checking potential issues on the node:
 
 ```bash
-kubectl describe node <nodnamn>
+kubectl describe node <node-name>
 ```
 
-Om man vill se en snabb överblick över CPU och Minnesanvändning så finns också top:
+If you want a quick overview of CPU and memory usage, there is also top:
 
 ```bash
 kubectl top nodes
@@ -70,30 +70,30 @@ kubectl top nodes
 
 ## Pod network
 
-I Kubernetes lever varje pod i ett eget isolerat nätverksnamnrymd (network namespace) och tilldelas en unik intern IP-
-adress ur ett dedikerat subnät (Pod CIDR som ställs in vid installation av k3s).
+In Kubernetes, every pod lives in its own isolated network namespace and is assigned a unique internal IP
+address from a dedicated subnet (the Pod CIDR that is configured when installing k3s).
 
-Grundregler för pod-nätverket:
+Basic rules for the pod network:
 
-* Alla poddar kan kommunicera med alla andra poddar på alla noder utan NAT (Network Address Translation).
+* All pods can communicate with all other pods on all nodes without NAT (Network Address Translation).
 
-* Agenten på en nod (t.ex. kubelet) kan kommunicera med alla poddar på samma nod.
+* The agent on a node (e.g. kubelet) can communicate with all pods on the same node.
 
-* Poddens egen IP är densamma som andra ser den som (ingen portmappning krävs mellan poddar).
+* A pod's own IP is the same as the one others see it as (no port mapping is required between pods).
 
-Hur det fungerar i praktiken:
+How it works in practice:
 
-* Realiseras av ett CNI-plugin (Container Network Interface, t.ex. Cilium, Calico eller Flannel).
+* Implemented by a CNI plugin (Container Network Interface, e.g. Cilium, Calico or Flannel).
 
-* CNI sätter upp virtuella nätverksgränssnitt (veth-par) som binder samman poddens nätverksnamnrymd med nodens nätverk.
+* CNI sets up virtual network interfaces (veth pairs) that connect the pod's network namespace with the node's network.
 
-# Se tilldelade pod-IPs och vilken nod de schemalagts på
+# See assigned pod IPs and which node they were scheduled on
 
 ```bash
 kubectl get pods -o wide
 ```
 
-# Testa kommunikation direkt mellan två poddar via IP
+# Test communication directly between two pods via IP
 
 ```bash
 kubectl exec -it <pod-a> -- ping <pod-b-ip>
@@ -101,32 +101,32 @@ kubectl exec -it <pod-a> -- ping <pod-b-ip>
 
 ## Host network
 
-När en pod konfigureras med hostNetwork: true delar den nätverksnamnrymd direkt med den underliggande noden istället för att få ett eget isolerat namespace.
-Typiska användningsområden:
+When a pod is configured with hostNetwork: true it shares the network namespace directly with the underlying node instead of getting its own isolated namespace.
+Typical use cases:
 
-Systemnära infrastrukturkomponenter och CNI-agenter som måste konfigurera nätverket på själva noden.
+Low-level infrastructure components and CNI agents that must configure the network on the node itself.
 
-Ingress controllers eller lastbalanserare som behöver direkt tillgång till nodens externa IP/portar utan kube-proxy-overhead.
+Ingress controllers or load balancers that need direct access to the node's external IP/ports without kube-proxy overhead.
 
-DaemonSets för nätverksövervakning eller telemetri.
+DaemonSets for network monitoring or telemetry.
 
 # Namespaces
 
-Ett Namespace är ett sätt att dela upp och isolera resurser inom ett och samma Kubernetes-kluster. 
+A Namespace is a way to divide and isolate resources within a single Kubernetes cluster.
 
-Det fungerar som ett virtuellt kluster inuti klustret för att separera miljöer, team eller projekt.
+It acts as a virtual cluster inside the cluster to separate environments, teams or projects.
 
-Vad namespaces ger
+What namespaces provide
 
-* Namnrymdsisolering: Olika namespaces kan ha resurser med identiska namn (t.ex. en service som heter web i både dev och prod).
+* Namespace isolation: Different namespaces can have resources with identical names (e.g. a service named web in both dev and prod).
 
-* Nätverksadressering: Påverkar DNS – interna anrop mellan tjänster i samma namespace kräver bara kortnamnet (backend), medan anrop över gränserna kräver backend.namespace
+* Network addressing: Affects DNS – internal calls between services in the same namespace only require the short name (backend), while calls across boundaries require backend.namespace
 
-* Åtkomstkontroll (RBAC): Rättigheter kan begränsas till ett specifikt namespace så att ett team bara kan administrera sina egna resurser.
+* Access control (RBAC): Permissions can be limited to a specific namespace so that a team can only administer its own resources.
 
-* Resursstyrning: Möjlighet att sätta gränser för CPU, minne och antal objekt via ResourceQuota och LimitRange.
+* Resource governance: The ability to set limits for CPU, memory and number of objects via ResourceQuota and LimitRange.
 
-# Lista alla befintliga namespaces
+# List all existing namespaces
 
 ```bash
 kubectl get namespaces
@@ -134,13 +134,13 @@ kubectl get namespaces
 kubectl get ns
 ```
 
-# Skapa ett nytt namespace
+# Create a new namespace
 
 ```bash
 kubectl create namespace workshop-demo
 ``` 
 
-# Kör ett kommando mot ett specifikt namespace
+# Run a command against a specific namespace
 
 ```bash
 kubectl get pods -n workshop-demo
@@ -148,119 +148,119 @@ kubectl get pods -n workshop-demo
 
 # Ingress
 
-Ingress är Kubernetes inbyggda sätt att exponera HTTP- och HTTPS-tjänster mot omvärlden via en gemensam ingång på applikationslagret (Layer 7).
+Ingress is Kubernetes' built-in way to expose HTTP and HTTPS services to the outside world through a common entry point at the application layer (Layer 7).
 
-Istället för att varje mikrotjänst kräver en egen extern lastbalanserare eller publik port, fungerar Ingress Controllern som en central reverse proxy och router inuti klustret.
+Instead of each microservice requiring its own external load balancer or public port, the Ingress Controller acts as a central reverse proxy and router inside the cluster.
 
-I många on-prem- eller bare-metal-miljöer släpper man inte in extern trafik rakt på poddarna. Istället kopplas en extern lastbalanserare ihop med Ingress Controllern via NodePort:
+In many on-prem or bare-metal environments, external traffic is not let straight onto the pods. Instead, an external load balancer is connected to the Ingress Controller via NodePort:
 
-Klient / Användare anropar publik domän (t.ex. app.exempel.se).
+Client / User calls a public domain (e.g. app.example.com).
 
-Extern Lastbalanserare (LB): Tar emot trafiken på standardportar (80/443), hanterar eventuell extern failover/hälsa och skickar trafiken vidare till klustrets noder via en tilldelad NodePort (t.ex. port 30080 / 30443).
+External Load Balancer (LB): Receives the traffic on standard ports (80/443), handles any external failover/health checks and forwards the traffic to the cluster's nodes via an assigned NodePort (e.g. port 30080 / 30443).
 
-Ingress Controller (t.ex. Traefik ): Lyssnar på den specifika NodePort-tjänsten på alla noder i klustret och tar emot trafiken.
+Ingress Controller (e.g. Traefik): Listens on the specific NodePort service on all nodes in the cluster and receives the traffic.
 
-Ingress-resurser (Reglerna): Controllern matchar inkommande HTTP-header (Host, sökväg, TLS) mot definierade Ingress-regler och routar trafiken direkt till rätt intern Service/Pod IP.
+Ingress resources (the rules): The controller matches the incoming HTTP header (Host, path, TLS) against defined Ingress rules and routes the traffic directly to the correct internal Service/Pod IP.
 
 # Load balancer
 
-Att förstå hur extern trafik når våra tjänster i Kubernetes handlar om att följa användarens anrop hela vägen in till rätt applikations-pod. Vår arkitektur bygger på tre centrala lager: DNS/VIP, NodePorts och Traefik Ingress Controller.
+Understanding how external traffic reaches our services in Kubernetes is about following the user's request all the way in to the correct application pod. Our architecture is built on three central layers: DNS/VIP, NodePorts and the Traefik Ingress Controller.
 
-Trafikflödet steg för steg
+The traffic flow step by step
 
-* Extern Lastbalanserare (VIP)
+* External Load Balancer (VIP)
 
-Lastbalanseraren tar emot anropet och balanserar trafiken över alla aktiva workernoder.
+The load balancer receives the request and balances the traffic across all active worker nodes.
 
-Kontinuerliga hälsokontroller säkerställer att trafik omedelbart styrs bort från noder som är otillgängliga, i underhållsläge (drain) eller inte svarar.
+Continuous health checks ensure that traffic is immediately steered away from nodes that are unavailable, in maintenance mode (drain) or not responding.
 
 * DNS & Wildcard
 
-Alla anrop mot klustret (t.ex. *.k8s.foretag.se) pekar mot vår externa lastbalanserares virtuella IP-adress (VIP).
-Fördel: Nya tjänster och mikrotjänster behöver ingen separat DNS-konfiguration; så fort en ingress-regel skapas i klustret matchas domänen automatiskt.
+All calls to the cluster (e.g. *.k8s.company.com) point to our external load balancer's virtual IP address (VIP).
+Advantage: New services and microservices need no separate DNS configuration; as soon as an ingress rule is created in the cluster the domain is matched automatically.
 
-* NodePorts som ingångsportar
+* NodePorts as entry ports
 
-Traefik exponeras internt i klustret via en Kubernetes Service av typen NodePort.
+Traefik is exposed internally in the cluster via a Kubernetes Service of type NodePort.
 
-En NodePort öppnar samma portintervall på samtliga workernoder i klustret:
+A NodePort opens the same port range on all worker nodes in the cluster:
 
-Motsvarande port 80 & 443: Webbtrafik (HTTP och HTTPS).
+Corresponding to port 80 & 443: Web traffic (HTTP and HTTPS).
 
-Dedikerade portar: Icke-HTTP-trafik (t.ex. SSH, activemq-artemis och liknande).
+Dedicated ports: Non-HTTP traffic (e.g. SSH, activemq-artemis and similar).
 
-Det spelar ingen roll vilken specifik nod förfrågan träffar; klustrets interna nätverkslager (kube-proxy) leder trafiken till en aktiv Traefik-pod.
+It does not matter which specific node the request hits; the cluster's internal network layer (kube-proxy) routes the traffic to an active Traefik pod.
 
 * Traefik (Ingress Controller)
 
-Traefik tar emot anropet från NodePorten och avgör vart det ska:
+Traefik receives the request from the NodePort and decides where it should go:
 
-HTTP/HTTPS (Lager 7): Läser av Host-headern (t.ex. app.k8s.foretag.se), matchar Path-regler, sköter TLS-terminering och lägger på eventuella middlewares (headers, autentisering, rate limiting).
+HTTP/HTTPS (Layer 7): Reads the Host header (e.g. app.k8s.company.com), matches path rules, handles TLS termination and applies any middlewares (headers, authentication, rate limiting).
 
-SSH & TCP/UDP (Lager 4): Matchar antingen på port eller via SNI och slussar trafiken transparent till rätt backend.
+SSH & TCP/UDP (Layer 4): Matches either on port or via SNI and passes the traffic transparently to the correct backend.
 
-Trafiken skickas slutligen direkt till mål-poddens interna IP.
+The traffic is finally sent directly to the target pod's internal IP.
 
 # Resources
 
 ## Service
 
-En Service är en nätverksabstraktion framför en dynamisk uppsättning poddar. 
+A Service is a network abstraction in front of a dynamic set of pods.
 
-Eftersom poddar är förgängliga och får nya IP-adresser när de startas om eller skalas, ger en Service en fast intern IP och ett stabilt DNS-namn.
+Because pods are ephemeral and get new IP addresses when they are restarted or scaled, a Service provides a fixed internal IP and a stable DNS name.
 
-Kubernetes inbyggda DNS-server (t.ex. CoreDNS) skapar automatiskt DNS-poster för varje Service. Detta minimerar hårdkodad nätverkskonfiguration mellan mikrotjänster.
+Kubernetes' built-in DNS server (e.g. CoreDNS) automatically creates DNS records for each Service. This minimizes hardcoded network configuration between microservices.
 
-Ett komplett FQDN har alltid formatet:
+A complete FQDN always has the format:
 
 `<service-name>.<namespace>.svc.cluster.local`
 
-Hur anrop förenklas inom klustret:
+How calls are simplified within the cluster:
 
-Samma namespace: En pod i samma namespace kan anropa enbart tjänstens namn
+Same namespace: A pod in the same namespace can call just the service name
 
 
 ```bash
 curl http://backend:8080
 ```
 
-Annat namespace: En pod i ett annat namespace anger servicenamn och namespace
+Other namespace: A pod in another namespace specifies the service name and namespace
 
 ```bash
 curl http://backend.prod:8080
 ```
 
-Fullständigt (FQDN): Används vid explicita behov eller för att undvika DNS-sökdomän-uppslag
+Fully qualified (FQDN): Used for explicit needs or to avoid DNS search-domain lookups
 
 ```bash
 curl http://backend.prod.svc.cluster.local:8080
 ```
 
-Precis som poddar har sitt eget nät (Pod CIDR), tilldelas Services virtuella IP-adresser ur ett eget dedikerat subnät som kallas Service CIDR.
+Just like pods have their own network (Pod CIDR), Services are assigned virtual IP addresses from their own dedicated subnet called the Service CIDR.
 
-Standard i k3s är `10.43.0.0/16` (konfigureras via --service-cidr vid klusterinstallation).
+The default in k3s is `10.43.0.0/16` (configured via --service-cidr at cluster installation).
 
-Service-IP (ClusterIP) är inte bunden till något fysiskt eller virtuellt nätverkskort på noderna.
+The Service IP (ClusterIP) is not bound to any physical or virtual network interface on the nodes.
 
-Det är kube-proxy (eller CNI via eBPF/iptables) som fångar upp trafik adresserad till Service CIDR och lastbalanserar den direkt vidare till rätt underliggande Pod-IP.
+It is kube-proxy (or CNI via eBPF/iptables) that intercepts traffic addressed to the Service CIDR and load balances it directly onward to the correct underlying Pod IP.
 
-Vanliga Service-Typer
+Common Service types
 
-* ClusterIP: (Standard) Får en intern IP ur Service CIDR. Endast nåbar inifrån klustret.
+* ClusterIP: (Default) Gets an internal IP from the Service CIDR. Only reachable from inside the cluster.
 
-* NodePort: Öppnar en statisk port (standard 30000–32767) på alla noder. Vidarebefordrar trafiken till en underliggande ClusterIP.
+* NodePort: Opens a static port (default 30000–32767) on all nodes. Forwards the traffic to an underlying ClusterIP.
 
-* LoadBalancer: Bygger på NodePort men begär en extern lastbalanserare från underliggande moln/infrastruktur.
+* LoadBalancer: Builds on NodePort but requests an external load balancer from the underlying cloud/infrastructure.
 
-* Headless Service (clusterIP: None): Tilldelas ingen virtuell IP alls. DNS-anrop returnerar istället A-records direkt till de matchande poddarnas IP-adresser.
+* Headless Service (clusterIP: None): Is assigned no virtual IP at all. DNS calls instead return A records directly to the matching pods' IP addresses.
 
-# Lista services i ett namespace (visar ClusterIP, portar och typ)
+# List services in a namespace (shows ClusterIP, ports and type)
 
 ```bash
 kubectl get svc -n backend
 ```
 
-# Se vilka faktiska pod-IPs som servicen pekar ut just nu
+# See which actual pod IPs the service points to right now
 
 ```bash
 kubectl get endpoints api-service -n backend
@@ -268,35 +268,35 @@ kubectl get endpoints api-service -n backend
 
 ## CM (Config Maps)
 
-En ConfigMap är ett API-objekt som används för att lagra icke-känslig data i form av nyckel-värde-par.
+A ConfigMap is an API object used to store non-sensitive data in the form of key-value pairs.
 
-Dess huvudsakliga syfte är att separera miljöspecifik konfiguration från images.
+Its main purpose is to separate environment-specific configuration from images.
 
-En Pod kan läsa CM's på 3 olika sätt
+A Pod can read CMs in 3 different ways
 
-* Miljövariabler, Mappa nycklarna till miljövariabler
+* Environment variables: Map the keys to environment variables
 
-* Monterade volymer: Montera din ConfigMap som en fil eller mapp inuti containern. Detta är perfekt för att skicka in hela konfigurationsfiler.
+* Mounted volumes: Mount your ConfigMap as a file or directory inside the container. This is perfect for passing in entire configuration files.
 
-* Command-Line Arguments: Skicka in värdena i containerns startkommando.
+* Command-Line Arguments: Pass the values into the container's start command.
 
 ## Secrets
 
-En Secret är en speciell CM för att lagra och hantera känslig data – såsom lösenord, tokens, API-nycklar och SSH/TLS-certifikat 
+A Secret is a special CM for storing and managing sensitive data – such as passwords, tokens, API keys and SSH/TLS certificates 
 
-– utan att hårdkoda dem i container-images eller pod-specar.
+– without hardcoding them in container images or pod specs.
 
-Vi använder `external-secret-operator` som gör att vi kan lagra hemligheterna i Hashicorp Vault och sedan mappa detta till kubernetes secrets.
+We use `external-secret-operator` which lets us store the secrets in Hashicorp Vault and then map them to kubernetes secrets.
 
-Det finns två vanliga sätt att ge en container tillgång till en Secret:
+There are two common ways to give a container access to a Secret:
 
-Som miljövariabler (Environment Variables):
+As environment variables:
 
-Bra för enkla lösenord eller konfigurationssträngar.
+Good for simple passwords or configuration strings.
 
-Monterade som filer (Volumes):
+Mounted as files (Volumes):
 
-Standard för certifikat, nycklar eller större hemligheter. Kubernetes monterar dem som en tmpfs (RAM-baserad volym i minnet) så att de aldrig skrivs till nodens fysiska disk.
+Standard for certificates, keys or larger secrets. Kubernetes mounts them as a tmpfs (RAM-based volume in memory) so that they are never written to the node's physical disk.
 
 ## Labels
 
@@ -382,64 +382,64 @@ kubectl apply -k --enable-helm .
 
 # Storage
 
-Kubernetes hanterar lagring genom att frikoppla applikationens behov av disk från den underliggande lagringsinfrastrukturen. 
+Kubernetes manages storage by decoupling the application's need for disk from the underlying storage infrastructure.
 
-Detta görs via två centrala byggstenar: PersistentVolume (PV) och PersistentVolumeClaim (PVC).
+This is done via two central building blocks: PersistentVolume (PV) and PersistentVolumeClaim (PVC).
 
 PV vs PVC
 
 PersistentVolume (PV):
 
-Den faktiska lagringsresursen (t.ex. lokal disk, NFS, iSCSI eller ett SAN-block).
+The actual storage resource (e.g. local disk, NFS, iSCSI or a SAN block).
 
-*   Är klusterövergripande (tillhör inte ett namespace).
+*   Is cluster-wide (does not belong to a namespace).
 
-*   Skapas antingen statiskt av en klusteradministratör eller dynamiskt via en StorageClass.
+*   Created either statically by a cluster administrator or dynamically via a StorageClass.
 
 PersistentVolumeClaim (PVC):
 
-*   En beställning från en användare/pod.
+*   A request from a user/pod.
 
-*   Är bunden till ett specifikt namespace.
+*   Is bound to a specific namespace.
 
-*   Specificerar behov: storlek (t.ex. 10Gi), access mode och eventuell StorageClass.
+*   Specifies needs: size (e.g. 10Gi), access mode and any StorageClass.
 
-När en PVC skapas letar Kubernetes efter en matchande PV och binder dem till varandra (status: Bound) i en 1:1-relation.
+When a PVC is created, Kubernetes looks for a matching PV and binds them together (status: Bound) in a 1:1 relationship.
 
-Access Modes - Anger hur volymen får monteras av noder
+Access Modes - Specify how the volume may be mounted by nodes
 
-*   RWO - ReadWriteOnce monteras för läsning och skrivning av en enskild nod åt gången (vanligt för blocklagring/lokal disk)
+*   RWO - ReadWriteOnce mounted for reading and writing by a single node at a time (common for block storage/local disk)
 
-*   ROX - ReadOnlyMany monteras som skrivskyddad av många noder samtidigt
+*   ROX - ReadOnlyMany mounted as read-only by many nodes simultaneously
 
-*   RWX - ReadWriteMany monteras för läsning och skrivning av flera noder samtidigt (kräver filsystem som t.ex. NFS).
+*   RWX - ReadWriteMany mounted for reading and writing by multiple nodes simultaneously (requires a filesystem such as NFS).
 
 
 ## Longhorn
 
-Longhorn är en distribuerad blocklagringslösning med öppen källkod som är designad direkt för Kubernetes. 
+Longhorn is a distributed, open-source block storage solution designed directly for Kubernetes.
 
-Den förvandlar lokal lagring på klusternoder till ett feltåligt, replikerat och distribuerat lagringsnätverk.
+It turns local storage on cluster nodes into a fault-tolerant, replicated and distributed storage network.
 
-Hur Longhorn fungerar i praktiken
+How Longhorn works in practice
 
-* Synkron replikering: Varje volym delas upp i ett definierat antal kopior (replikor, ofta 3 stycken som standard) som sprids ut över olika noder i klustret.
+* Synchronous replication: Each volume is split into a defined number of copies (replicas, often 3 by default) that are spread across different nodes in the cluster.
 
-* Microservices per volym: Longhorn kör en dedikerad controller och volymmotor per aktiv volym via containrar på noderna.
+* Microservices per volume: Longhorn runs a dedicated controller and volume engine per active volume via containers on the nodes.
 
-* iSCSI i botten: Poddar ansluter till sina volymer via nodens lokala iSCSI-interface som skapats av Longhorns CSI-driver.
+* iSCSI underneath: Pods connect to their volumes via the node's local iSCSI interface created by Longhorn's CSI driver.
 
-* Om en nod med en körande pod dör kan Kubernetes schemalägga om podden till en annan nod, och Longhorn ansluter omedelbart till en av de befintliga replikerna där.
+* If a node with a running pod dies, Kubernetes can reschedule the pod to another node, and Longhorn immediately connects to one of the existing replicas there.
 
-Centrala funktioner
+Central features
 
-* Inbyggd StorageClass: Registrerar automatiskt longhorn som lagringsklass, vilket gör det enkelt att dynamiskt provisionera PV:er via vanliga PVC:er.
+* Built-in StorageClass: Automatically registers longhorn as a storage class, which makes it easy to dynamically provision PVs via ordinary PVCs.
 
-* Snapshots och Backups: Inbyggt stöd för schemalagda snapshots lokalt samt asynkrona backuper till extern S3-kompatibel lagring eller NFS.
+* Snapshots and Backups: Built-in support for scheduled snapshots locally as well as asynchronous backups to external S3-compatible storage or NFS.
 
-* Webb-UI
+* Web UI
 
-* Stöd för ReadWriteMany (RWX): Kan via en integrerad NFS-server erbjuda volymer som delas mellan flera noder samtidigt.
+* ReadWriteMany (RWX) support: Can, via an integrated NFS server, offer volumes shared between multiple nodes simultaneously.
 
 # Operators
 
@@ -516,7 +516,8 @@ Operator that creates ArgoCD application from a directory or file structure.
 ## k3s
 
 ### Rancher
-Fixa access, hämta k8s config.
+
+Set up access, fetch k8s config.
 
 ## Kyverno
 
