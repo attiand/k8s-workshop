@@ -50,7 +50,7 @@ kubectl delete pod nginx-pod
 ## Create Deployment & Service
 
 * Skapa filen [deployment.yaml](lab/1/deployment.yaml)
-* Skapa filen [serice.yaml](lab/1/service.yaml)
+* Skapa filen [service.yaml](lab/1/service.yaml)
 
 ```bash
 kubectl apply -f deployment.yaml
